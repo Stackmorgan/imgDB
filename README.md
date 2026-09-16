@@ -1,4 +1,3 @@
-Here is the complete README.md ready to copy:
 
 # ImgDB
 
@@ -28,10 +27,12 @@ Install using Composer:
 ```bash
 composer require imgdb/imgdb
 
+```
+
 Composer will automatically install the required KyPHP dependency.
 
 Basic Usage
-
+```
 <?php
 
 require 'vendor/autoload.php';
@@ -52,19 +53,20 @@ $image = $imgbb->upload(
 );
 
 echo $image->url();
+```
 
 Expiration
 
 ImgDB does not send an expiration value by default.
 
 To request an expiration time, provide the number of seconds:
-
+```
 $image = $imgbb->upload(
     'photo.jpg',
     null,
     3600
 );
-
+```
 This requests a 1-hour expiration.
 
 ImgBB accepts expiration values from 60 to 15552000 seconds.
@@ -72,7 +74,7 @@ ImgBB accepts expiration values from 60 to 15552000 seconds.
 Batch Uploads
 
 Multiple images can be uploaded concurrently:
-
+```
 $images = $imgbb->uploadBatch([
     'one.jpg',
     'two.jpg',
@@ -82,9 +84,9 @@ $images = $imgbb->uploadBatch([
 foreach ($images as $image) {
     echo $image->url() . PHP_EOL;
 }
-
+```
 Batch Uploads With Expiration
-
+```
 $images = $imgbb->uploadBatch(
     [
         'one.jpg',
@@ -98,11 +100,11 @@ $images = $imgbb->uploadBatch(
 foreach ($images as $image) {
     echo $image->url() . PHP_EOL;
 }
-
+```
 This requests a 24-hour expiration for each image.
 
 Response
-
+````
 Both "upload()" and "uploadBatch()" return "ImgDB\Response" objects.
 
 Available methods:
@@ -136,9 +138,9 @@ $image->size();
 $image->expiration();
 
 $image->toArray();
-
+````
 Complete Example
-
+```
 <?php
 
 require 'vendor/autoload.php';
@@ -156,9 +158,9 @@ echo 'URL: ' . $image->url() . PHP_EOL;
 echo 'Thumbnail: ' . $image->thumbnail() . PHP_EOL;
 echo 'Medium: ' . $image->medium() . PHP_EOL;
 echo 'Delete URL: ' . $image->deleteUrl() . PHP_EOL;
-
+```
 Batch Example
-
+```
 <?php
 
 require 'vendor/autoload.php';
@@ -176,9 +178,9 @@ $images = $imgbb->uploadBatch([
 foreach ($images as $image) {
     echo $image->url() . PHP_EOL;
 }
-
+```
 Project Structure
-
+```
 imgdb/
 ├── src/
 │   ├── ImgBB.php
@@ -186,7 +188,7 @@ imgdb/
 │   └── Response.php
 ├── composer.json
 └── README.md
-
+```
 How It Works
 
 ImgDB provides a simple interface around the ImgBB upload API.
