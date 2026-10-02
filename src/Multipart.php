@@ -1,6 +1,6 @@
 <?php
 
-namespace ImgBB;
+namespace ImgDB;
 
 use Exception;
 

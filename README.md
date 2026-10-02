@@ -36,17 +36,17 @@ Basic Usage
 
 require 'vendor/autoload.php';
 
-use ImgDB\ImgBB;
+use ImgDB\ImgDB;
 
-$imgbb = new ImgBB('YOUR_IMGBB_API_KEY');
+$imgdb = new ImgDB('YOUR_IMGBB_API_KEY');
 
-$image = $imgbb->upload('photo.jpg');
+$image = $imgdb->upload('photo.jpg');
 
 echo $image->url();
 ```
 Upload With a Name
 ```
-$image = $imgbb->upload(
+$image = $imgdb->upload(
     'photo.jpg',
     'my-photo'
 );
@@ -59,7 +59,7 @@ ImgDB does not send an expiration value by default.
 
 To request an expiration time, provide the number of seconds:
 ```
-$image = $imgbb->upload(
+$image = $imgdb->upload(
     'photo.jpg',
     null,
     3600
@@ -73,9 +73,9 @@ Retries
 ```
 ImgDB uses KyPHP's retry system for failed requests.
 
-$imgbb = new ImgBB('YOUR_IMGBB_API_KEY');
+$imgdb = new ImgDB('YOUR_IMGBB_API_KEY');
 
-$image = $imgbb
+$image = $imgdb
     ->retry(3)
     ->upload('photo.jpg');
 ```
@@ -89,9 +89,9 @@ Debugging
 
 KyPHP debugging can be enabled through ImgDB:
 ```
-$imgbb = new ImgBB('YOUR_IMGBB_API_KEY');
+$imgdb = new ImgDB('YOUR_IMGBB_API_KEY');
 
-$image = $imgbb
+$image = $imgdb
     ->debug()
     ->upload('photo.jpg');
 ```
@@ -99,7 +99,7 @@ This enables KyPHP's request debug output.
 
 Debugging can also be disabled explicitly:
 ```
-$imgbb->debug(false);
+$imgdb->debug(false);
 ```
 Request Hooks
 
@@ -109,7 +109,7 @@ Before Request
 
 The "beforeRequest()" callback runs before each request attempt.
 ```
-$imgbb
+$imgdb
     ->beforeRequest(function ($request) {
         echo "Uploading image...\n";
     })
@@ -121,7 +121,7 @@ After Response
 
 The "afterResponse()" callback runs after a response is received.
 ```
-$imgbb
+$imgdb
     ->afterResponse(function ($response) {
         echo "HTTP status: " . $response['status'] . "\n";
     })
@@ -138,7 +138,7 @@ Batch Uploads
 
 Multiple images can be uploaded concurrently.
 ```
-$images = $imgbb->uploadBatch([
+$images = $imgdb->uploadBatch([
     'one.jpg',
     'two.jpg',
     'three.png'
@@ -152,7 +152,7 @@ Batch requests use KyPHP's asynchronous batch support, allowing multiple HTTP re
 
 Batch Uploads With Expiration
 ```
-$images = $imgbb->uploadBatch(
+$images = $imgdb->uploadBatch(
     [
         'one.jpg',
         'two.jpg',
@@ -210,11 +210,11 @@ Complete Example
 
 require 'vendor/autoload.php';
 
-use ImgDB\ImgBB;
+use ImgDB\ImgDB;
 
-$imgbb = new ImgBB('YOUR_IMGBB_API_KEY');
+$imgdb = new ImgDB('YOUR_IMGBB_API_KEY');
 
-$image = $imgbb
+$image = $imgdb
     ->retry(3)
     ->upload(
         __DIR__ . '/images/photo.jpg',
@@ -232,11 +232,11 @@ Batch Example
 
 require 'vendor/autoload.php';
 
-use ImgDB\ImgBB;
+use ImgDB\ImgDB;
 
-$imgbb = new ImgBB('YOUR_IMGBB_API_KEY');
+$imgdb = new ImgDB('YOUR_IMGBB_API_KEY');
 
-$images = $imgbb->uploadBatch([
+$images = $imgdb->uploadBatch([
     __DIR__ . '/images/one.jpg',
     __DIR__ . '/images/two.jpg',
     __DIR__ . '/images/three.jpg'
@@ -250,7 +250,7 @@ Project Structure
 ```
 imgdb/
 ├── src/
-│   ├── ImgBB.php
+│   ├── ImgDB.php
 │   ├── Multipart.php
 │   └── Response.php
 ├── composer.json
@@ -280,7 +280,7 @@ KyPHP handles the HTTP layer, including:
 
 This keeps ImgDB focused on the ImgBB API instead of duplicating HTTP functionality.
 
-You only need to interact with the "ImgBB" and "Response" classes.
+You only need to interact with the "ImgDB" and "Response" classes.
 
 License
 

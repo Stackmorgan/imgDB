@@ -1,11 +1,11 @@
 <?php
 
-namespace ImgBB;
+namespace ImgDB;
 
 use Exception;
 use KyPHP\KyPHP;
 
-class ImgBB
+class ImgDB
 {
     private string $apiKey;
     private string $endpoint = 'https://api.imgbb.com/1/upload';
@@ -140,7 +140,11 @@ class ImgBB
         $results = [];
 
         foreach ($responses as $response) {
-            $results[] = new Response($response);
+            $body = $response['body'] ?? [];
+
+            $results[] = new Response(
+                is_array($body) ? $body : []
+            );
         }
 
         return $results;
@@ -187,24 +191,85 @@ class ImgBB
     /**
      * Set the multipart request body.
      *
-     * This currently uses KyPHP's internal body property because
-     * the public KyPHP API does not yet expose a raw-body setter.
+     * KyPHP only exposes a JSON body setter, so the raw multipart payload is
+     * written directly to its internal body property. The write is scoped to
+     * the class that actually declares the property and is verified
+     * afterwards, so an incompatible KyPHP version fails loudly instead of
+     * silently sending an empty body.
      */
     private function setBody(
         KyPHP $request,
         string $body
     ): void {
+        $property = $this->findBodyProperty($request);
+
+        if ($property === null) {
+            throw new Exception(
+                'KyPHP does not expose a raw body setter; ' .
+                'upgrade KyPHP or send the payload through json()'
+            );
+        }
+
+        if (
+            $property->isReadOnly() &&
+            $property->isInitialized($request)
+        ) {
+            throw new Exception(
+                'The KyPHP body property is readonly and already set; ' .
+                'this KyPHP version is not compatible with ImgDB'
+            );
+        }
+
+        $scope = $property
+            ->getDeclaringClass()
+            ->getName();
+
         $setter = \Closure::bind(
             static function (
-                KyPHP $request,
+                object $request,
                 string $body
             ): void {
                 $request->body = $body;
             },
             null,
-            KyPHP::class
+            $scope
         );
 
+        if ($setter === null) {
+            throw new Exception(
+                "Unable to access the KyPHP body property in {$scope}"
+            );
+        }
+
         $setter($request, $body);
+
+        if ($property->getValue($request) !== $body) {
+            throw new Exception(
+                'Failed to set the KyPHP body property; ' .
+                'this KyPHP version is not compatible with ImgDB'
+            );
+        }
+    }
+
+    /**
+     * Locate KyPHP's body property anywhere in its class hierarchy.
+     *
+     * Private properties are invisible to reflection on a child class, so
+     * the lookup walks up to the class that actually declares it.
+     */
+    private function findBodyProperty(
+        KyPHP $request
+    ): ?\ReflectionProperty {
+        $class = new \ReflectionClass($request);
+
+        while ($class !== false) {
+            if ($class->hasProperty('body')) {
+                return $class->getProperty('body');
+            }
+
+            $class = $class->getParentClass();
+        }
+
+        return null;
     }
 }
